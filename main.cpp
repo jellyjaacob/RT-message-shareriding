@@ -8,6 +8,10 @@ Assignment 4
 */
 
 #define DEFAULT_PRODUCTION_LIMIT 120;
+#define MAX_RIDER_REQUEST 12;
+#define MAX_HUMAN_RIDER_REQUEST 4;
+#define PRODUCERS 2;
+#define CONSUMERS 2;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,29 +26,21 @@ Assignment 4
 #include <string.h>
 #include <time.h>
 #include <vector>
+#include "ridesharing.h"
+
 using namespace std;
-#define CFB 1;
-#define EES 2;
-sem_t semEmpty;
-sem_t semFull;
 
 int main (int argc, char* argv[]) {
-
-    sem_t MutualExclusion;
-
-    if (sem_init(&MutualExclusion, 0, 1) == -1)
-	    // unable to initialize semaphore, report failure;
-        perror("Thread was unable to be created!");
     
-    int idx, Option;
+    int idx, option;
 
     // parameters
     int numRequest;
 
     // get optional command line arguments
-    while ((Option = getopt(argc, argv, "n:c:f:h:a:"))) {
+    while ((option = getopt(argc, argv, "n:c:f:h:a:"))) {
         
-        switch(Option) {
+        switch(option) {
             case 'n':
                 numRequest = atoi(optarg);
             case 'c':
@@ -57,5 +53,18 @@ int main (int argc, char* argv[]) {
                 // number of milliseconds required to produce a ride request for an autonomous driver
         }
     }
+
+    // semaphores + pthreads
+    
+    sem_t sharedSemaphore;
+    int sharedValue = 0;
+
+    if (sem_init(&sharedSemaphore, 0, sharedValue) == -1)
+	    // unable to initialize semaphore, report failure;
+        perror("Thread was unable to be created!");
+
+    //for (int i = 0; i < PRODUCERS; i++) {}
+        // pthread_create();
+        
 
 }
