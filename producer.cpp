@@ -7,8 +7,12 @@ CS480-03
 Assignment 4
 */
 
-/*
-void producer() {
+#include "producer.h"
+
+
+
+void* producer(void* voidPtr){
+    /*
     ItemType Item;
     while (true) {
         Item = new ItemType(); //Producing an item
@@ -19,7 +23,7 @@ void producer() {
         Buffer.Insert(Item);
         mutex.signal(); //up
         Unconsumed.signal();  //up, inform consumer
-    } 
-} */
+    } */
+} 
 
 //void produce

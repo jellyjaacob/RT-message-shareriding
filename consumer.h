@@ -7,3 +7,12 @@ CS480-03
 Assignment 4
 */
 
+#ifndef CONSUMER_H
+#define CONSUMER_H
+
+#include <semaphore.h>
+#include <unistd.h>
+
+void* consumer(void* voidPtr);
+
+#endif

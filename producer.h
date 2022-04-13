@@ -7,3 +7,12 @@ CS480-03
 Assignment 4
 */
 
+#ifndef PRODUCER_H
+#define PRODUCER_H
+
+#include <semaphore.h>
+#include <unistd.h>
+
+void* producer(void* voidPtr);
+
+#endif

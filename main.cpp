@@ -27,6 +27,9 @@ Assignment 4
 #include <time.h>
 #include <vector>
 #include "ridesharing.h"
+#include "producer.h"
+#include "consumer.h"
+#include "broker.h"
 
 using namespace std;
 
@@ -66,5 +69,19 @@ int main (int argc, char* argv[]) {
     //for (int i = 0; i < PRODUCERS; i++) {}
         // pthread_create();
         
+    pthread_t humanDriverThread;
+    pthread_t roboDriverThread;
+    pthread_t costDispatchThread;
+    pthread_t fastDispatchThread;
+
+    pthread_attr_t pthread_attributes;
+    pthread_attr_init(&pthread_attributes);
+
+    pthread_create(&humanDriverThread, &pthread_attributes, producer, someStruct);
+    pthread_create(&roboDriverThread, &pthread_attributes, producer, someStruct);
+    pthread_create(&costDispatchThread, &pthread_attributes, consumer, someStruct);
+    pthread_create(&fastDispatchThread, &pthread_attributes, consumer, someStruct);
+
+
 
 }
