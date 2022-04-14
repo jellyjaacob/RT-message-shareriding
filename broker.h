@@ -10,6 +10,15 @@ Assignment 4
 #ifndef BROKER_H
 #define BROKER_H
 
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <queue>
+#include "ridesharing.h"
+#include "io.h"
+#include "sharedStruct.h"
+
 /*
 Each time the broker request queue is mutated (addition or removal), a message should be
 printed indicating which thread performed the action and the current state, i.e., descriptive
@@ -21,5 +30,18 @@ broker request queue.
     and how many of each type were processed by each of the consumer threads, use
     io_production_report. 
 */
+
+class REQUEST{
+    public:
+        REQUEST(int id);
+        int item_id;
+        string name;
+};
+
+void add(int item_id, queue<REQUEST*> *broker);
+int remove(string consumer, queue<REQUEST*> broker);
+int *getCostDispatch();
+int *getFastDispatch();
+int *getProduced();
 
 #endif

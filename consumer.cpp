@@ -23,6 +23,6 @@ void* consumer(void* voidPtr){
 
         AvailableSlots.signal(); //up
         consume(item);  //consume or use item
-        */
-    }
+        
+    }*/
 }

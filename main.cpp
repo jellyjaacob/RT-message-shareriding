@@ -7,67 +7,77 @@ CS480-03
 Assignment 4
 */
 
-#define DEFAULT_PRODUCTION_LIMIT 120;
-#define MAX_RIDER_REQUEST 12;
-#define MAX_HUMAN_RIDER_REQUEST 4;
-#define PRODUCERS 2;
-#define CONSUMERS 2;
-
-#include <stdio.h>
-#include <stdlib.h>
 #include <pthread.h>
-#include "semaphore.h"
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <string.h>
 #include <time.h>
-#include <vector>
+#include "semaphore.h"
 #include "ridesharing.h"
 #include "producer.h"
 #include "consumer.h"
 #include "broker.h"
+#include "sharedStruct.h"
 
 using namespace std;
 
 int main (int argc, char* argv[]) {
+
+    struct rideShare* sharedAttribute = new rideShare(); // initialize the struct
     
+    //initialize our struct's semaphores and variables
+    sem_init(&sharedAttribute->start, 0, 1);
+    sem_init(&sharedAttribute->maxQuantity, 0, DEFAULT_PRODUCTION_LIMIT);
+    sem_init(&sharedAttribute->maxHuman, 0, MAX_HUMAN_RIDER_REQUEST);
+    sem_init(&sharedAttribute->currBrokerReq, 0, 0);
+    sem_init(&sharedAttribute->access, 0, 1);
+    sem_init(&sharedAttribute->locked, 0, MAX_RIDER_REQUEST);
+
+    sharedAttribute->buffer = new queue<REQUEST*>;
+    sharedAttribute->nFlag = 0;
+    sharedAttribute->cFlag = 0;
+    sharedAttribute->fFlag = 0;
+    sharedAttribute->hFlag = 0;
+    sharedAttribute->aFlag = 0;
+
+    sharedAttribute->nVal = 0;
+    sharedAttribute->cVal = 0;
+    sharedAttribute->fVal = 0;
+    sharedAttribute->hVal = 0;
+    sharedAttribute->aVal = 0;
+
+    sharedAttribute->consumer_id = 0;
+    sharedAttribute->producer_id = 0;
+    sharedAttribute->maxRequests = DEFAULT_PRODUCTION_LIMIT;
+    
+
     int idx, option;
 
-    // parameters
-    int numRequest;
-
     // get optional command line arguments
-    while ((option = getopt(argc, argv, "n:c:f:h:a:"))) {
+    while ((option = getopt(argc, argv, "n:c:f:h:a:")) != -1) {
         
         switch(option) {
             case 'n':
-                numRequest = atoi(optarg);
+                sharedAttribute->nFlag = 1;
+                sharedAttribute->maxQuantity = atoi(optarg);
+                break;
             case 'c':
-                //TODO
+                sharedAttribute->cFlag = 1;
+                sharedAttribute->cVal = atoi(optarg);
+                break;
             case 'f':
-                // Similar argument for the fast-matching dispatcher
+                sharedAttribute->fFlag = 1;
+                sharedAttribute->fVal = atoi(optarg);
+                break;
             case 'h':
-                // number of milliseconds required to produce a ride request for  a human driver
+                sharedAttribute->hFlag = 1;
+                sharedAttribute->hVal = atoi(optarg);
+                break;
             case 'a':
-                // number of milliseconds required to produce a ride request for an autonomous driver
+                sharedAttribute->aFlag = 1;
+                sharedAttribute->aVal = atoi(optarg);
+                break;
+            default:
+                exit(1);
         }
     }
-
-    // semaphores + pthreads
-    
-    sem_t sharedSemaphore;
-    int sharedValue = 0;
-
-    if (sem_init(&sharedSemaphore, 0, sharedValue) == -1)
-	    // unable to initialize semaphore, report failure;
-        perror("Thread was unable to be created!");
-
-    //for (int i = 0; i < PRODUCERS; i++) {}
-        // pthread_create();
         
     pthread_t humanDriverThread;
     pthread_t roboDriverThread;
@@ -77,11 +87,10 @@ int main (int argc, char* argv[]) {
     pthread_attr_t pthread_attributes;
     pthread_attr_init(&pthread_attributes);
 
-    pthread_create(&humanDriverThread, &pthread_attributes, producer, someStruct);
-    pthread_create(&roboDriverThread, &pthread_attributes, producer, someStruct);
-    pthread_create(&costDispatchThread, &pthread_attributes, consumer, someStruct);
-    pthread_create(&fastDispatchThread, &pthread_attributes, consumer, someStruct);
+    pthread_create(&humanDriverThread, &pthread_attributes, producer, sharedAttribute);
+    pthread_create(&roboDriverThread, &pthread_attributes, producer, sharedAttribute);
+    pthread_create(&costDispatchThread, &pthread_attributes, consumer, sharedAttribute);
+    pthread_create(&fastDispatchThread, &pthread_attributes, consumer, sharedAttribute);
 
-
-
+    //do something with semaphores
 }

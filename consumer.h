@@ -12,6 +12,9 @@ Assignment 4
 
 #include <semaphore.h>
 #include <unistd.h>
+#include "sharedStruct.h"
+#include "broker.h"
+#include <time.h>
 
 void* consumer(void* voidPtr);
 

@@ -9,9 +9,10 @@ Assignment 4
 
 #include "producer.h"
 
-
-
 void* producer(void* voidPtr){
+
+    
+
     /*
     ItemType Item;
     while (true) {
