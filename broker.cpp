@@ -8,3 +8,9 @@ Assignment 4
 */
 
 #include "broker.h"
+
+void add(int item_id, queue<REQUEST*> *broker) {}
+int remove(string consumer, queue<REQUEST*> broker) {}
+int *getCostDispatch() {}
+int *getFastDispatch() {}
+int *getProduced() {}

@@ -43,5 +43,4 @@ int remove(string consumer, queue<REQUEST*> broker);
 int *getCostDispatch();
 int *getFastDispatch();
 int *getProduced();
-
 #endif
