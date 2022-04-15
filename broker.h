@@ -34,11 +34,11 @@ broker request queue.
 class REQUEST{
     public:
         REQUEST(int id);
-        int item_id;
+        int request_id;
         string name;
 };
 
-void add(int item_id, queue<REQUEST*> *broker);
+void add(int request_id, queue<REQUEST*> *broker);
 int remove(string consumer, queue<REQUEST*> broker);
 int *getCostDispatch();
 int *getFastDispatch();

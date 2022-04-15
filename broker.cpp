@@ -8,9 +8,57 @@ Assignment 4
 */
 
 #include "broker.h"
+#include "io.h"
+#include "ridesharing.h"
+#include <stdio.h>
 
-void add(int item_id, queue<REQUEST*> *broker) {}
-int remove(string consumer, queue<REQUEST*> broker) {}
-int *getCostDispatch() {}
-int *getFastDispatch() {}
-int *getProduced() {}
+using namespace std;
+
+// parameters
+int currHumans, currRobots;             // holds current human and robot drivers
+int totalHumans, totalRobots;           // holds total amount of humans and robots drivers
+int totalDrivers;                       // holds total drivers
+int humanCost, humanFast;               // holds how much the cost/fast algorithm has consumed of human drivers
+int robotCost, robotFast;               // holds how much the cost/fast algorithm has consumed of robot drivers
+int currBrokerAmount[2];                   // holds what request type is currently on broker
+int produced[2], consumed[2];           // arrays that will hold how many requests are produced and consumed 
+int cost_consumed[2], fast_consumed[2]; // arrays that will how many costAlgo and fastAlgo consumed
+RequestType req_type;
+ConsumerType consume_type;
+
+
+void add(int request_id, queue<REQUEST*> *broker) {
+
+    REQUEST *newRequest = new REQUEST(request_id);          // create a new request to be added into the broker queue
+    broker -> push(newRequest);                             // push that new request into the queue
+    req_type = request_id ? Human : Robot;                  // assign req_type to be either human or robot
+    currBrokerAmount[req_type] += 1;                           // increment the type of driver by 1
+    produced[req_type] += 1;                                // increment the total request by 1
+    io_add_type(req_type, currBrokerReq, produced);         // print it out!
+
+}
+
+int remove(string consumer, queue<REQUEST*> broker) {
+
+    REQUEST *newRequest = broker -> front();                // new request will get the first request from the broker queue
+    int request_id = newRequest -> request_id;              // store the request id into an int variable
+    broker -> pop();                                        // remove the request from the queue
+    consume_type = consumer.compare("CostAlgoDispatch")     // cost algo is 0, fast algo is 1
+        == 0 ? CostAlgoDispatch : FastAlgoDispatch;
+    req_type = request_id ? Human : Robot;                  // human is 0, robot is 1
+    currBrokerAmount[req_type] -= 1;                        // remove by 1 what is currently on the broker array
+
+    if (consume_type == CostAlgoDispatch) {
+        cost_consumed[req_type] += 1;                       // cost algorithm consumes a request
+        io_remove_type(CostAlgoDispatch, req_type, broker, cost_consumed);  // print it out!
+    } else if (consume_type == FastAlgoDispatch) {
+        fast_consumed[req_type] += 1;                       // fast algorithm consumes a request
+        io_remove_type(FastAlgoDispatch, req_type, broker, fast_consumed);  // print it out!
+    }
+
+    return request_id;                                      // now return the request we removed
+
+}
+int *getCostDispatch() { return cost_consumed; }
+int *getFastDispatch() { return fast_consumed; }
+int *getProduced() { return produced; }
