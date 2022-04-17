@@ -23,12 +23,16 @@ int main (int argc, char* argv[]) {
     struct rideShare* sharedAttribute = new rideShare(); // initialize the struct
     
     //initialize our struct's semaphores and variables
+    int maxProduction = DEFAULT_PRODUCTION_LIMIT;
+    int maxHR = MAX_HUMAN_RIDER_REQUEST;
+    int maxRR = MAX_RIDER_REQUEST;
+
     sem_init(&sharedAttribute->start, 0, 1);
-    sem_init(&sharedAttribute->maxQuantity, 0, DEFAULT_PRODUCTION_LIMIT);
-    sem_init(&sharedAttribute->maxHuman, 0, MAX_HUMAN_RIDER_REQUEST);
+    sem_init(&sharedAttribute->maxQuantity, 0, maxProduction);
+    sem_init(&sharedAttribute->maxHuman, 0, maxHR);
     sem_init(&sharedAttribute->currBrokerReq, 0, 0);
     sem_init(&sharedAttribute->access, 0, 1);
-    sem_init(&sharedAttribute->locked, 0, MAX_RIDER_REQUEST);
+    sem_init(&sharedAttribute->locked, 0, maxRR);
 
     sharedAttribute->buffer = new queue<REQUEST*>;
     sharedAttribute->nFlag = 0;

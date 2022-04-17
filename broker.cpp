@@ -26,12 +26,12 @@ int cost_consumed[2], fast_consumed[2]; // arrays that will how many costAlgo an
 RequestType req_type;
 ConsumerType consume_type;
 
-// constructor for 
+// constructor for Requests
 REQUEST::REQUEST(int id)
 {
     request_id = id;
     name = request_id ? "Human" : "Robot";
-    // if item_id is 0, then return EES, else return CFB
+    // if item_id is 0, then return Human, else return Robot
 }
 
 

@@ -37,7 +37,7 @@ void* producer(void* voidPtr){
 
             }
             sem_wait(&prodAttr->access); // give access to the current type of request
-            //insert(request_id, prodAttr->buffer);
+            add(request_id, prodAttr->buffer);
             sem_post(&prodAttr->currBrokerReq); // signal the current broker request is on
             sem_post(&prodAttr->access); // do not give access to current type of request
 

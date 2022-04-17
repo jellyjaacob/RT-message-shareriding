@@ -19,13 +19,13 @@ void* consumer(void* voidPtr) {
     struct timespec timer; // struct to use nanosleep
 
     sem_wait(&consAttr -> start);                   // lock the start semaphore
-    int consumerID = consAttr->consumer_id;         // variable to hold consumer ID
-    string consumerName = consumerID ? RoboDriver : HumanDriver;
+    int consumerID = consAttr->consumer_id++;         // variable to hold consumer ID
+    string consumerName = consumerID ? "RoboDriver" : "HumanDriver";
     sem_post(&consAttr -> start);                   // unlock the start semaphore
 
-    while (consAttr -> maxQuantity >= 0) {
-
-        while (sem_wait(&consAttr->currBrokerReq) && )
+    /*
+    while (consAttr -> maxQuantity >= 0) {  //loop until the consumers reach max quantity
+        while (sem_wait(&consAttr->currBrokerReq) && )  //lock while there are still consumer requests
 
     }
 
@@ -33,16 +33,16 @@ void* consumer(void* voidPtr) {
         while(!sem_wait(&consAttr->maxQuantity)) { // produce until maxQuantity
         
             sem_wait(&consAttr -> access);                          // lock the semaphore and give current consumer access to broker queue
-            int cID = remove(consumerName, &prodAttr -> buffer);
+            int cID = remove(consumerName, consAttr -> buffer);
             if (cID == 0) { sem_post(&consAttr -> maxHuman); }      // if human driver is consumed, signal to attain more requests
             sem_post(&consAttr -> locked);                          // unlock semaphore if there is room on the queue
-            &consAttr -> maxRequests--;                             // decrement the amount of request to consume
+            consAttr -> maxRequests--;                             // decrement the amount of request to consume
 
             if (consAttr -> maxRequests == 0) { //sem_post(&consAttr -> ) } // suppose to kill all threads b/c all requests have been consumed
 
             sem_post(&consAttr -> access);                          // unlock the semaphore and remove access to broker queue
         
-            if (consAttr->cFLag && consumerID) {                             // delay consumption for ethel
+            if (consAttr->cFlag && consumerID) {                             // delay consumption for ethel
                 timer.tv_nsec = (double)consAttr->cVal / NS_PER_MS; // set the delay after what was passed after -E
                 nanosleep(&timer, NULL);
             }
@@ -51,7 +51,30 @@ void* consumer(void* voidPtr) {
                 timer.tv_nsec = (double)consAttr->fVal / NS_PER_MS; // set the delay after what was passed after -L
                 nanosleep(&timer, NULL);
             }
+        } */
+    while (consAttr -> maxQuantity >= 0) {  //loop until the consumers reach max quantity
+        if(consAttr -> currBrokerReq > 0){
+            while (!sem_wait(&consAttr->currBrokerReq)){
+                sem_wait(&consAttr -> access);                          // lock the semaphore and give current consumer access to broker queue
+                int cID = remove(consumerName, consAttr -> buffer);
+                if (cID == 0) { sem_post(&consAttr -> maxHuman); }      // if human driver is consumed, signal to attain more requests
+                sem_post(&consAttr -> locked);                          // unlock semaphore if there is room on the queue
+                consAttr -> maxRequests--;                             // decrement the amount of request to consume
+
+                if (consAttr -> maxRequests == 0) { //sem_post(&consAttr -> ) } // suppose to kill all threads b/c all requests have been consumed
+
+                sem_post(&consAttr -> access);                          // unlock the semaphore and remove access to broker queue
+            
+                if (consAttr->cFlag && consumerID) {                             // delay consumption for ethel
+                    timer.tv_nsec = (double)consAttr->cVal / NS_PER_MS; // set the delay after what was passed after -E
+                    nanosleep(&timer, NULL);
+                }
+                else if (consAttr->fFlag && consumerID == 0)
+                {                                                 // delay consumption for lucy
+                    timer.tv_nsec = (double)consAttr->fVal / NS_PER_MS; // set the delay after what was passed after -L
+                    nanosleep(&timer, NULL);
+                }
+            }
         }
-
-
+    }
 }
