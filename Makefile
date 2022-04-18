@@ -20,14 +20,14 @@ CXXFLAGS=-std=c++11 -g
 # make target specifies a specific target
 # $^ is an example of a special variable.  It substitutes all dependencies
 
-rideshare : producer.o consumer.o borker.o io.o main.o
+rideshare : producer.o consumer.o broker.o io.o main.o
 	$(CXX) $(CXXFLAGS) -o rideshare $^ -lpthread -lrt
 
 producer.o : producer.h producer.cpp
 
 consumer.o : consumer.h consumer.cpp
 
-broker.o : broker.h broker.cpp
+broker.o : broker.h broker.cpp 
 
 io.o : io.h io.cpp
 

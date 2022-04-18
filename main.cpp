@@ -9,8 +9,6 @@ Assignment 4
 
 #include <pthread.h>
 #include <time.h>
-#include "semaphore.h"
-#include "ridesharing.h"
 #include "producer.h"
 #include "consumer.h"
 #include "broker.h"
@@ -33,8 +31,10 @@ int main (int argc, char* argv[]) {
     sem_init(&sharedAttribute->currBrokerReq, 0, 0);
     sem_init(&sharedAttribute->access, 0, 1);
     sem_init(&sharedAttribute->locked, 0, maxRR);
+    sem_init(&sharedAttribute->finalReq, 0, 0);
 
     sharedAttribute->buffer = new queue<REQUEST*>;
+
     sharedAttribute->nFlag = 0;
     sharedAttribute->cFlag = 0;
     sharedAttribute->fFlag = 0;

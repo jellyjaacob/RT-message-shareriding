@@ -15,9 +15,6 @@ Assignment 4
 #include <stdlib.h>
 #include <string>
 #include <queue>
-#include "ridesharing.h"
-#include "io.h"
-#include "sharedStruct.h"
 
 /*
 Each time the broker request queue is mutated (addition or removal), a message should be
@@ -31,7 +28,9 @@ broker request queue.
     io_production_report. 
 */
 
-class REQUEST{
+using namespace std;
+
+class REQUEST {
     public:
         REQUEST(int id);
         int request_id;
@@ -39,7 +38,7 @@ class REQUEST{
 };
 
 void add(int request_id, queue<REQUEST*> *broker);
-int remove(string consumer, queue<REQUEST*> broker);
+int remove(string consumer, queue<REQUEST*> *broker);
 int *getCostDispatch();
 int *getFastDispatch();
 int *getProduced();

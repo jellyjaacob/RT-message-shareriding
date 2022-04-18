@@ -10,6 +10,7 @@ Assignment 4
 #ifndef SHARED_STRUCT
 #define SHARED_STRUCT
 
+#include <queue>
 #include "broker.h"
 #include <pthread.h>
 #include <semaphore.h>
@@ -30,8 +31,9 @@ struct rideShare {
     sem_t currBrokerReq;    // semaphore for what it is on current broken request
     sem_t access;           // semaphore to give a producer/consumer access to broker queue
     sem_t locked;           // semaphore for locking broker queue until there is room 
+    sem_t finalReq;         // semaphore for the last request
 
-    queue<REQUEST*> buffer; // buffer to hold the requests
+    queue<REQUEST*> *buffer; // buffer to hold the requests
     
     // flags for optional arguments, set to 0 for false 1 for true
     int nFlag;

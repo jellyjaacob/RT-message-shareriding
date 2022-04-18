@@ -16,7 +16,7 @@ Assignment 4
 void* producer(void* voidPtr){
 
     struct rideShare *prodAttr = new rideShare(); // semaphore to operate on
-    struct timespec timer; // struct to use nanosleep
+    static timespec timer; // struct to use nanosleep
 
     sem_wait(&prodAttr->start); // lock the semaphore 
     int request_id = prodAttr->producer_id++; // once done, increment prod_id to human/robot driver
