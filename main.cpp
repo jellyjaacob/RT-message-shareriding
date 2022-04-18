@@ -30,7 +30,11 @@ int main (int argc, char* argv[]) {
     sem_init(&sharedAttribute->currBrokerReq, 0, 0);    
     sem_init(&sharedAttribute->access, 0, 1);
     sem_init(&sharedAttribute->locked, 0, MAX_RIDER_REQUEST);
+    //sem_init(&sharedAttribute->finalCostReq, 0, 0);
+    //sem_init(&sharedAttribute->finalFastReq, 0, 0);
     sem_init(&sharedAttribute->finalReq, 0, 0);
+
+
 
     sharedAttribute->buffer = new queue<REQUEST*>;
 
@@ -48,10 +52,10 @@ int main (int argc, char* argv[]) {
 
     sharedAttribute->consumer_id = 0;
     sharedAttribute->producer_id = 0;
+
     sharedAttribute->curRequests = 0;
     sharedAttribute->maxRequests = DEFAULT_PRODUCTION_LIMIT;
     
-
     int idx, option;
 
     // get optional command line arguments
@@ -97,7 +101,10 @@ int main (int argc, char* argv[]) {
     pthread_create(&fastDispatchThread, &pthread_attributes, consumer, sharedAttribute);
 
     //wait for the barrier to consume the final request
+    //sem_wait(&sharedAttribute->finalCostReq);
+    //sem_wait(&sharedAttribute->finalFastReq);
     sem_wait(&sharedAttribute->finalReq);
+
     int *cost = getCostDispatch();
     int *fast = getFastDispatch();
     int *produced = getProduced();

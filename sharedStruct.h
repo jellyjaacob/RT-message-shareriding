@@ -11,16 +11,13 @@ Assignment 4
 #define SHARED_STRUCT
 
 #include <queue>
-#include "broker.h"
 #include <pthread.h>
 #include <semaphore.h>
+#include "broker.h"
 
-#define DEFAULT_PRODUCTION_LIMIT 120;
-#define MAX_RIDER_REQUEST 12;
-#define MAX_HUMAN_RIDER_REQUEST 4;
-#define PRODUCERS 2;
-#define CONSUMERS 2;
-#define REQUEST_TYPES 2;
+#define DEFAULT_PRODUCTION_LIMIT 120
+#define MAX_RIDER_REQUEST 12
+#define MAX_HUMAN_RIDER_REQUEST 4
 
 using namespace std;
 
@@ -30,7 +27,9 @@ struct rideShare {
     sem_t currBrokerReq;    // semaphore for what it is on current broken request
     sem_t access;           // semaphore to give a producer/consumer access to broker queue (mutex)
     sem_t locked;           // semaphore for locking broker queue until there is room/empty space on buffer
-    sem_t finalReq;         // semaphore for the last request
+    sem_t finalReq;
+    //sem_t finalCostReq;         // semaphore for the last request
+    //sem_t finalFastReq;
 
     queue<REQUEST*> *buffer; // buffer to hold the requests
     
