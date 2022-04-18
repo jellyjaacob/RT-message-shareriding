@@ -18,62 +18,32 @@ void* consumer(void* voidPtr) {
     struct rideShare *consAttr = (struct rideShare *)voidPtr; // semaphore to operate on
     static timespec timer; // struct to use nanosleep
 
-    sem_wait(&consAttr -> start);                   // lock the start semaphore
     int consumerID = consAttr->consumer_id++;         // variable to hold consumer ID
-    string consumerName = consumerID ? "RoboDriver" : "HumanDriver";
-    sem_post(&consAttr -> start);                   // unlock the start semaphore
+    string consumerName = consumerID ? "RoboDriver" : "HumanDriver";    //set the type of driver based on the consumer id
 
-    /*
-    while (consAttr -> maxQuantity >= 0) {  //loop until the consumers reach max quantity
-        while (sem_wait(&consAttr->currBrokerReq) && )  //lock while there are still consumer requests
+    while(true){
+        sem_wait(&consAttr->currBrokerReq);                 // lock what is on the broker
 
-    }
-
-    if(consAttr->maxQuantity > 0) // as long as semaphore is positive
-        while(!sem_wait(&consAttr->maxQuantity)) { // produce until maxQuantity
+        sem_wait(&consAttr->access);                        // lock access to the critical region
+        int cID = remove(consumerName, consAttr -> buffer); // consume the item by taking it off the broker
+        if (cID == 0) { sem_post(&consAttr -> maxHuman); }  
+        sem_post(&consAttr->access);                        // unlock and give access
+        sem_post(&consAttr->locked);                        // unlock the space on the broker
         
-            sem_wait(&consAttr -> access);                          // lock the semaphore and give current consumer access to broker queue
-            int cID = remove(consumerName, consAttr -> buffer);
-            if (cID == 0) { sem_post(&consAttr -> maxHuman); }      // if human driver is consumed, signal to attain more requests
-            sem_post(&consAttr -> locked);                          // unlock semaphore if there is room on the queue
-            consAttr -> maxRequests--;                             // decrement the amount of request to consume
+        if(consAttr->curRequests == consAttr-> maxRequests) {   // when max requests are reached -> final request has been made -> break out of loop
+            sem_post(&consAttr->finalReq);
+            break;
+        }
 
-            if (consAttr -> maxRequests == 0) { //sem_post(&consAttr -> ) } // suppose to kill all threads b/c all requests have been consumed
-
-            sem_post(&consAttr -> access);                          // unlock the semaphore and remove access to broker queue
-        
-            if (consAttr->cFlag && consumerID) {                             // delay consumption for ethel
-                timer.tv_nsec = (double)consAttr->cVal / NS_PER_MS; // set the delay after what was passed after -E
-                nanosleep(&timer, NULL);
-            }
-            else if (consAttr->fFlag && consumerID == 0)
-            {                                                 // delay consumption for lucy
-                timer.tv_nsec = (double)consAttr->fVal / NS_PER_MS; // set the delay after what was passed after -L
-                nanosleep(&timer, NULL);
-            }
-        } */
-    while (consAttr -> maxQuantity >= 0) {  //loop until the consumers reach max quantity
-        if(consAttr -> currBrokerReq > 0){
-            while (!sem_wait(&consAttr->currBrokerReq)){
-                sem_wait(&consAttr -> access);                          // lock the semaphore and give current consumer access to broker queue
-                int cID = remove(consumerName, consAttr -> buffer);
-                if (cID == 0) { sem_post(&consAttr -> maxHuman); }      // if human driver is consumed, signal to attain more requests
-                sem_post(&consAttr -> locked);                          // unlock semaphore if there is room on the queue
-                consAttr -> maxRequests--;                              // decrement the amount of request to consume
-
-                if (consAttr -> maxRequests == 0) { sem_post(&consAttr -> finalReq); } // suppose to kill all threads b/c all requests have been consumed
-
-                sem_post(&consAttr -> access);                          // unlock the semaphore and remove access to broker queue
-            
-                if (consAttr->cFlag && consumerID) {                    
-                    timer.tv_nsec = (double)consAttr->cVal / NS_PER_MS; // set the delay after what was passed after -c
-                    nanosleep(&timer, NULL);
-                }
-                else if (consAttr->fFlag && consumerID == 0) {                                                       
-                    timer.tv_nsec = (double)consAttr->fVal / NS_PER_MS; // set the delay after what was passed after -f
-                    nanosleep(&timer, NULL);
-                }
-            }
+        // check the flags and set the appropriate delay
+        if (consAttr->cFlag && consumerID) {                    
+            timer.tv_nsec = (double)consAttr->cVal / NS_PER_MS; // set the delay after what was passed after -c
+            nanosleep(&timer, NULL);
+        }
+        else if (consAttr->fFlag && consumerID == 0) {                                                       
+            timer.tv_nsec = (double)consAttr->fVal / NS_PER_MS; // set the delay after what was passed after -f
+            nanosleep(&timer, NULL);
         }
     }
+    pthread_exit(NULL);
 }

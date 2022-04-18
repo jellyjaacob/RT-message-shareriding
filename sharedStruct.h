@@ -20,17 +20,16 @@ Assignment 4
 #define MAX_HUMAN_RIDER_REQUEST 4;
 #define PRODUCERS 2;
 #define CONSUMERS 2;
+#define REQUEST_TYPES 2;
 
 using namespace std;
 
 struct rideShare {
 
-    sem_t start;            // semaphore for first request
-    sem_t maxQuantity;      // semaphore for max amount of production limit request
     sem_t maxHuman;         // semaphore for max amount of human request
     sem_t currBrokerReq;    // semaphore for what it is on current broken request
-    sem_t access;           // semaphore to give a producer/consumer access to broker queue
-    sem_t locked;           // semaphore for locking broker queue until there is room 
+    sem_t access;           // semaphore to give a producer/consumer access to broker queue (mutex)
+    sem_t locked;           // semaphore for locking broker queue until there is room/empty space on buffer
     sem_t finalReq;         // semaphore for the last request
 
     queue<REQUEST*> *buffer; // buffer to hold the requests
@@ -51,6 +50,7 @@ struct rideShare {
 
     int consumer_id;        // id for consumer
     int producer_id;        // id for producer
+    int curRequests;        // current amount of requests
     int maxRequests;        // max amount of requests
 
 };

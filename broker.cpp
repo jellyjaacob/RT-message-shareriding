@@ -15,14 +15,14 @@ Assignment 4
 using namespace std;
 
 // parameters
-int currHumans, currRobots;             // holds current human and robot drivers
-int totalHumans, totalRobots;           // holds total amount of humans and robots drivers
-int totalDrivers;                       // holds total drivers
-int humanCost, humanFast;               // holds how much the cost/fast algorithm has consumed of human drivers
-int robotCost, robotFast;               // holds how much the cost/fast algorithm has consumed of robot drivers
-int currBrokerAmount[2];                   // holds what request type is currently on broker
-int produced[2], consumed[2];           // arrays that will hold how many requests are produced and consumed 
-int cost_consumed[2], fast_consumed[2]; // arrays that will how many costAlgo and fastAlgo consumed
+int currHumans, currRobots;                     // holds current human and robot drivers
+int totalHumans, totalRobots;                   // holds total amount of humans and robots drivers
+int totalDrivers;                               // holds total drivers
+int humanCost, humanFast;                       // holds how much the cost/fast algorithm has consumed of human drivers
+int robotCost, robotFast;                       // holds how much the cost/fast algorithm has consumed of robot drivers
+int currBrokerAmount[REQUEST_TYPES];                        // holds what request type is currently on broker
+int produced[PRODUCERS], consumed[CONSUMERS];   // arrays that will hold how many requests are produced and consumed 
+int cost_consumed[REQUEST_TYPES], fast_consumed[REQUEST_TYPES];         // arrays that will hold how many costAlgo and fastAlgo consumed
 RequestType req_type;
 ConsumerType consume_type;
 

@@ -13,6 +13,7 @@ Assignment 4
 #include "consumer.h"
 #include "broker.h"
 #include "sharedStruct.h"
+#include "io.h"
 
 using namespace std;
 
@@ -25,12 +26,10 @@ int main (int argc, char* argv[]) {
     int maxHR = MAX_HUMAN_RIDER_REQUEST;
     int maxRR = MAX_RIDER_REQUEST;
 
-    sem_init(&sharedAttribute->start, 0, 1);
-    sem_init(&sharedAttribute->maxQuantity, 0, maxProduction);
-    sem_init(&sharedAttribute->maxHuman, 0, maxHR);
-    sem_init(&sharedAttribute->currBrokerReq, 0, 0);
+    sem_init(&sharedAttribute->maxHuman, 0, MAX_HUMAN_RIDER_REQUEST);
+    sem_init(&sharedAttribute->currBrokerReq, 0, 0);    
     sem_init(&sharedAttribute->access, 0, 1);
-    sem_init(&sharedAttribute->locked, 0, maxRR);
+    sem_init(&sharedAttribute->locked, 0, MAX_RIDER_REQUEST);
     sem_init(&sharedAttribute->finalReq, 0, 0);
 
     sharedAttribute->buffer = new queue<REQUEST*>;
@@ -49,6 +48,7 @@ int main (int argc, char* argv[]) {
 
     sharedAttribute->consumer_id = 0;
     sharedAttribute->producer_id = 0;
+    sharedAttribute->curRequests = 0;
     sharedAttribute->maxRequests = DEFAULT_PRODUCTION_LIMIT;
     
 
@@ -60,7 +60,7 @@ int main (int argc, char* argv[]) {
         switch(option) {
             case 'n':
                 sharedAttribute->nFlag = 1;
-                sharedAttribute->maxQuantity = atoi(optarg);
+                sharedAttribute->maxRequests = atoi(optarg);
                 break;
             case 'c':
                 sharedAttribute->cFlag = 1;
@@ -96,5 +96,12 @@ int main (int argc, char* argv[]) {
     pthread_create(&costDispatchThread, &pthread_attributes, consumer, sharedAttribute);
     pthread_create(&fastDispatchThread, &pthread_attributes, consumer, sharedAttribute);
 
-    //do something with semaphores
+    //wait for the barrier to consume the final request
+    sem_wait(&sharedAttribute->finalReq);
+    int *cost = getCostDispatch();
+    int *fast = getFastDispatch();
+    int *produced = getProduced();
+    int *producers[REQUEST_TYPES] = {cost, fast};
+    io_production_report(produced, producers);
+    return 0;
 }

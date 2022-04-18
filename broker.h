@@ -15,6 +15,7 @@ Assignment 4
 #include <stdlib.h>
 #include <string>
 #include <queue>
+#include "sharedStruct.h"
 
 /*
 Each time the broker request queue is mutated (addition or removal), a message should be
