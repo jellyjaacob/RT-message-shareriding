@@ -15,12 +15,9 @@ Assignment 4
 #include <pthread.h>
 #include <semaphore.h>
 
-#define DEFAULT_PRODUCTION_LIMIT 120;
-#define MAX_RIDER_REQUEST 12;
-#define MAX_HUMAN_RIDER_REQUEST 4;
-#define PRODUCERS 2;
-#define CONSUMERS 2;
-#define REQUEST_TYPES 2;
+#define DEFAULT_PRODUCTION_LIMIT 120
+#define MAX_RIDER_REQUEST 12
+#define MAX_HUMAN_RIDER_REQUEST 4
 
 using namespace std;
 

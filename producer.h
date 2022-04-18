@@ -16,6 +16,9 @@ Assignment 4
 #include "broker.h"
 #include <time.h>
 
+//producer function to accept requests for human and autonomous drivers
+//publishes these requests to the broker
+//takes in a void pointer to access struct with semaphores
 void* producer(void* voidPtr);
 
 #endif

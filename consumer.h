@@ -16,6 +16,9 @@ Assignment 4
 #include "broker.h"
 #include <time.h>
 
+//consumes requests by using a fast saving or a cost saving algorithm
+//takes requests off the broker and consumes them in the order they are published (FIFO)
+//takes in a void pointer to access struct with semaphores
 void* consumer(void* voidPtr);
 
 #endif

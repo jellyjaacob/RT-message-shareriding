@@ -13,6 +13,9 @@ Assignment 4
 // 1000 ms/s
 #define MS_PER_SEC 1000
 
+//consumes requests by using a fast saving or a cost saving algorithm
+//takes requests off the broker and consumes them in the order they are published (FIFO)
+//takes in a void pointer to access struct with semaphores
 void* consumer(void* voidPtr) {
 
     struct rideShare *consAttr = (struct rideShare *)voidPtr; // semaphore to operate on

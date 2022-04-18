@@ -13,6 +13,9 @@ Assignment 4
 // 1000 ms/s
 #define MS_PER_SEC 1000
 
+//producer function to accept requests for human and autonomous drivers
+//publishes these requests to the broker
+//takes in a void pointer to access struct with semaphores
 void* producer(void* voidPtr){
 
     struct rideShare *prodAttr = new rideShare(); // semaphore to operate on
