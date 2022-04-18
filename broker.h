@@ -15,7 +15,10 @@ Assignment 4
 #include <stdlib.h>
 #include <string>
 #include <queue>
-#include "sharedStruct.h"
+
+#define PRODUCERS 2
+#define CONSUMERS 2
+#define REQUEST_TYPES 2
 
 /*
 Each time the broker request queue is mutated (addition or removal), a message should be
@@ -31,6 +34,7 @@ broker request queue.
 
 using namespace std;
 
+//requests hold our consumer and producer requests and the type of consumer or producer request they are
 class REQUEST {
     public:
         REQUEST(int id);
@@ -38,9 +42,9 @@ class REQUEST {
         string name;
 };
 
-void add(int request_id, queue<REQUEST*> *broker);
-int remove(string consumer, queue<REQUEST*> *broker);
-int *getCostDispatch();
-int *getFastDispatch();
-int *getProduced();
+void add(int request_id, queue<REQUEST*> *broker);      // adds requests into the broker queue
+int remove(string consumer, queue<REQUEST*> *broker);   // removes requests from the broker queue
+int *getCostDispatch();                                 // returns how many cost algorithms were dispatched
+int *getFastDispatch();                                 // returns how many fast algorithms were dispatched
+int *getProduced();                                     // returns how many requests were produced
 #endif

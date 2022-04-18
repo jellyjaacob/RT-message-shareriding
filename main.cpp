@@ -87,6 +87,7 @@ int main (int argc, char* argv[]) {
         }
     }
         
+    //spawn and create our threads
     pthread_t humanDriverThread;
     pthread_t roboDriverThread;
     pthread_t costDispatchThread;
@@ -101,13 +102,19 @@ int main (int argc, char* argv[]) {
     pthread_create(&fastDispatchThread, &pthread_attributes, consumer, sharedAttribute);
 
     //wait for the barrier to consume the final request
+<<<<<<< HEAD
     //sem_wait(&sharedAttribute->finalCostReq);
     //sem_wait(&sharedAttribute->finalFastReq);
     sem_wait(&sharedAttribute->finalReq);
 
+=======
+    sem_wait(&sharedAttribute->finalReq);           
+
+    //variables to hold our values for production report
+>>>>>>> 0b6326d9358bd696b6244385f7424bea810a50da
     int *cost = getCostDispatch();
     int *fast = getFastDispatch();
-    int *produced = getProduced();
+    int *produced = getProduced();                  
     int *producers[REQUEST_TYPES] = {cost, fast};
     io_production_report(produced, producers);
     return 0;
