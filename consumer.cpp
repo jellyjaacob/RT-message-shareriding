@@ -25,22 +25,24 @@ void* consumer(void* voidPtr) {
     string consumerName = consumerID ? "CostAlgoDispatch" : "FastAlgoDispatch";    //set the type of driver based on the consumer id
     
     while(true){
-        sem_wait(&consAttr->currBrokerReq);                 // lock what is on the broker
+        if(consAttr->curRequests < consAttr-> maxRequests) {
+            
+            sem_wait(&consAttr->unconsumed);                    // lock what is on the broker
 
-        sem_wait(&consAttr->access);                        // lock access to the critical region
-        int cID = remove(consumerName, consAttr -> buffer); // consume the item by taking it off the broker
-        if (cID == 0) { sem_post(&consAttr -> maxHuman); }  
-        sem_post(&consAttr->access);                        // unlock and give access
-        sem_post(&consAttr->locked);                        // unlock the space on the broker
-        
-        if(consAttr->curRequests >= consAttr-> maxRequests) {   // when max requests are reached -> final request has been made -> break out of loop
+            sem_wait(&consAttr->access);                        // lock access to the critical region
+            int cID = remove(consumerName, consAttr -> buffer); // consume the item by taking it off the broker
+            if (cID == 0) { sem_post(&consAttr -> maxHuman); }  // if human request, increment 
+            sem_post(&consAttr->access);                        // unlock and give access
+            sem_post(&consAttr->locked);                        // unlock the space on the broker
+        }
+        else {   // when max requests are reached -> final request has been made -> break out of loop
             sem_post(&consAttr->access);
             sem_post(&consAttr->finalReq);
             break;
         }
 
         // check the flags and set the appropriate delay
-        if (consAttr->cFlag && consumerID == 0) {
+        if(consAttr->cFlag && consumerID == 0) {
             timer.tv_sec = consAttr->cVal / MSPERSEC;
             timer.tv_nsec = (consAttr->cVal / MSPERSEC) * NSPERMS;
             nanosleep(&timer, NULL); // set the delay after what was passed after -h
@@ -57,7 +59,9 @@ void* consumer(void* voidPtr) {
     else{
         sem_post(&consAttr->finalFastReq);
     } */
+
     pthread_exit(NULL); 
+
     /*
     while(true){
         if(consAttr->curRequests >= consAttr-> maxRequests) {   // when max requests are reached -> final request has been made -> break out of loop

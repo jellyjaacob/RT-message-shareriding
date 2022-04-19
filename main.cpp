@@ -27,14 +27,12 @@ int main (int argc, char* argv[]) {
     int maxRR = MAX_RIDER_REQUEST;
 
     sem_init(&sharedAttribute->maxHuman, 0, MAX_HUMAN_RIDER_REQUEST);
-    sem_init(&sharedAttribute->currBrokerReq, 0, 0);    
+    sem_init(&sharedAttribute->unconsumed, 0, 0);    
     sem_init(&sharedAttribute->access, 0, 1);
     sem_init(&sharedAttribute->locked, 0, MAX_RIDER_REQUEST);
+    sem_init(&sharedAttribute->finalReq, 0, 0);
     //sem_init(&sharedAttribute->finalCostReq, 0, 0);
     //sem_init(&sharedAttribute->finalFastReq, 0, 0);
-    sem_init(&sharedAttribute->finalReq, 0, 0);
-
-
 
     sharedAttribute->buffer = new queue<REQUEST*>;
 
@@ -87,7 +85,6 @@ int main (int argc, char* argv[]) {
         }
     }
         
-    //spawn and create our threads
     pthread_t humanDriverThread;
     pthread_t roboDriverThread;
     pthread_t costDispatchThread;
@@ -102,19 +99,13 @@ int main (int argc, char* argv[]) {
     pthread_create(&fastDispatchThread, &pthread_attributes, consumer, sharedAttribute);
 
     //wait for the barrier to consume the final request
-<<<<<<< HEAD
     //sem_wait(&sharedAttribute->finalCostReq);
     //sem_wait(&sharedAttribute->finalFastReq);
     sem_wait(&sharedAttribute->finalReq);
 
-=======
-    sem_wait(&sharedAttribute->finalReq);           
-
-    //variables to hold our values for production report
->>>>>>> 0b6326d9358bd696b6244385f7424bea810a50da
     int *cost = getCostDispatch();
     int *fast = getFastDispatch();
-    int *produced = getProduced();                  
+    int *produced = getProduced();
     int *producers[REQUEST_TYPES] = {cost, fast};
     io_production_report(produced, producers);
     return 0;

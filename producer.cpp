@@ -35,22 +35,22 @@ void* producer(void* voidPtr){
             timer.tv_nsec = (prodAttr->aVal / MSPERSEC) * NSPERMS;            
             nanosleep(&timer, NULL); // set the delay after what was passed after -e
         }
-        //until current is greater than max, produce
+        // until current is greater than max, produce
         if(prodAttr->curRequests < prodAttr->maxRequests){
-            if(request_id == 0){ // check if it is a human request
+            if(request_id == 0) // check for human request
                 sem_wait(&prodAttr->maxHuman);
-            }
-            sem_wait(&prodAttr->locked); // lock the semaphore until space is available
 
-            sem_wait(&prodAttr->access); // give access to the current type of request
+            sem_wait(&prodAttr->locked);        // lock the semaphore until space is available
+            sem_wait(&prodAttr->access);        // give access to the critical region
+
             add(request_id, prodAttr->buffer);
-            prodAttr->curRequests++;
-            sem_post(&prodAttr->currBrokerReq); // signal the current broker request is on
-            sem_post(&prodAttr->access); // do not give access to current type of request
+            prodAttr->curRequests++;            // increment up to max
+            sem_post(&prodAttr->unconsumed);    
+            sem_post(&prodAttr->access);        // remove access to critical region
         }
         else{
-            sem_post(&prodAttr->currBrokerReq);
-            sem_post(&prodAttr->access);
+            sem_post(&prodAttr->unconsumed);    
+            sem_post(&prodAttr->access);        // remove access to critical region
             break;
         }
     }

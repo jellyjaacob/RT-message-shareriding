@@ -24,7 +24,7 @@ using namespace std;
 struct rideShare {
 
     sem_t maxHuman;         // semaphore for max amount of human request
-    sem_t currBrokerReq;    // semaphore for what it is on current broken request
+    sem_t unconsumed;       // semaphore for what it is on current broken request
     sem_t access;           // semaphore to give a producer/consumer access to broker queue (mutex)
     sem_t locked;           // semaphore for locking broker queue until there is room/empty space on buffer
     sem_t finalReq;
