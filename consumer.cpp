@@ -27,26 +27,26 @@ void* consumer(void* voidPtr) {
     while(true){
         if(consAttr->curRequests < consAttr-> maxRequests) {
             
-            sem_wait(&consAttr->unconsumed);                    // lock what is on the broker
+            sem_wait(&consAttr->unconsumedRequests);                    // lock what is on the broker
 
-            sem_wait(&consAttr->access);                        // lock access to the critical region
+            sem_wait(&consAttr->mutex);                        // lock access to the critical region
             int cID = remove(consumerName, consAttr -> buffer); // consume the item by taking it off the broker
-            if (cID == 0) { sem_post(&consAttr -> maxHuman); }  // if human request, increment 
-            sem_post(&consAttr->access);                        // unlock and give access
-            sem_post(&consAttr->locked);                        // unlock the space on the broker
+            if (cID == HUMAN) { sem_post(&consAttr -> maxHumanRequests); }  // if human request, increment 
+            sem_post(&consAttr->mutex);                        // unlock and give access
+            sem_post(&consAttr->maxRiderRequests);                        // unlock the space on the broker
         }
         else {   // when max requests are reached -> final request has been made -> break out of loop
-            sem_post(&consAttr->access);
-            sem_post(&consAttr->finalReq);
+            sem_post(&consAttr->mutex);
+            sem_post(&consAttr->finalRequest);
             break;
         }
 
         // check the flags and set the appropriate delay
-        if(consAttr->cFlag && consumerID == 0) {
+        if(consAttr->cFlag && consumerID == HUMAN) {
             timer.tv_sec = consAttr->cVal / MSPERSEC;
             timer.tv_nsec = (consAttr->cVal / MSPERSEC) * NSPERMS;
             nanosleep(&timer, NULL); // set the delay after what was passed after -h
-        } else if (consAttr->fFlag && consumerID == 1){
+        } else if (consAttr->fFlag && consumerID == AUTONOMOUS){
             timer.tv_sec = consAttr->fVal / MSPERSEC;
             timer.tv_nsec = (consAttr->fVal / MSPERSEC) * NSPERMS;            
             nanosleep(&timer, NULL); // set the delay after what was passed after -e
@@ -54,10 +54,10 @@ void* consumer(void* voidPtr) {
     }
     /*
     if(consumerName.compare("CostAlgoDispatch")){
-        sem_post(&consAttr->finalCostReq);
+        sem_post(&consAttr->finalCostRequest);
     }
     else{
-        sem_post(&consAttr->finalFastReq);
+        sem_post(&consAttr->finalFastRequest);
     } */
 
     pthread_exit(NULL); 

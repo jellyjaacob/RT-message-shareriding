@@ -22,17 +22,13 @@ int main (int argc, char* argv[]) {
     struct rideShare* sharedAttribute = new rideShare(); // initialize the struct
     
     //initialize our struct's semaphores and variables
-    int maxProduction = DEFAULT_PRODUCTION_LIMIT;
-    int maxHR = MAX_HUMAN_RIDER_REQUEST;
-    int maxRR = MAX_RIDER_REQUEST;
-
-    sem_init(&sharedAttribute->maxHuman, 0, MAX_HUMAN_RIDER_REQUEST);
-    sem_init(&sharedAttribute->unconsumed, 0, 0);    
-    sem_init(&sharedAttribute->access, 0, 1);
-    sem_init(&sharedAttribute->locked, 0, MAX_RIDER_REQUEST);
-    sem_init(&sharedAttribute->finalReq, 0, 0);
-    //sem_init(&sharedAttribute->finalCostReq, 0, 0);
-    //sem_init(&sharedAttribute->finalFastReq, 0, 0);
+    sem_init(&sharedAttribute->maxHumanRequests, 0, MAX_HUMAN_RIDER_REQUEST);
+    sem_init(&sharedAttribute->maxRiderRequests, 0, MAX_RIDER_REQUEST);
+    sem_init(&sharedAttribute->unconsumedRequests, 0, 0);    
+    sem_init(&sharedAttribute->mutex, 0, 1);
+    sem_init(&sharedAttribute->finalRequest, 0, 0);
+    //sem_init(&sharedAttribute->finalCostRequest, 0, 0);
+    //sem_init(&sharedAttribute->finalFastRequest, 0, 0);
 
     sharedAttribute->buffer = new queue<REQUEST*>;
 
@@ -99,9 +95,9 @@ int main (int argc, char* argv[]) {
     pthread_create(&fastDispatchThread, &pthread_attributes, consumer, sharedAttribute);
 
     //wait for the barrier to consume the final request
-    //sem_wait(&sharedAttribute->finalCostReq);
-    //sem_wait(&sharedAttribute->finalFastReq);
-    sem_wait(&sharedAttribute->finalReq);
+    //sem_wait(&sharedAttribute->finalCostRequest);
+    //sem_wait(&sharedAttribute->finalFastRequest);
+    sem_wait(&sharedAttribute->finalRequest);
 
     int *cost = getCostDispatch();
     int *fast = getFastDispatch();
