@@ -97,12 +97,12 @@ int main (int argc, char* argv[]) {
     //wait for the barrier to consume the final request
     //sem_wait(&sharedAttribute->finalCostRequest);
     //sem_wait(&sharedAttribute->finalFastRequest);
-    sem_wait(&sharedAttribute->finalRequest);
+    sem_wait(&sharedAttribute->finalRequest);       // enter critical region
 
     int *cost = getCostDispatch();
     int *fast = getFastDispatch();
     int *produced = getProduced();
     int *producers[REQUEST_TYPES] = {cost, fast};
     io_production_report(produced, producers);
-    return 0;
+    return 0;                                       // exit 
 }

@@ -29,7 +29,7 @@ ConsumerType consume_type;
 REQUEST::REQUEST(int id)
 {
     request_id = id;
-    name = request_id ? "Human" : "Robot";
+    name = request_id ? "RoboDriver" : "HumanDriver";
     // if item_id is 0, then return Human, else return Robot
 }
 
@@ -38,7 +38,7 @@ void add(int request_id, queue<REQUEST*> *broker) {
 
     REQUEST *newRequest = new REQUEST(request_id);          // create a new request to be added into the broker queue
     broker -> push(newRequest);                             // push that new request into the queue
-    req_type = request_id ? HumanDriver : RoboDriver;       // assign req_type to be either human or robot
+    req_type = request_id ? RoboDriver : HumanDriver;       // assign req_type to be either human or robot
     currBrokerAmount[req_type] += 1;                        // increment the type of driver by 1
     produced[req_type] += 1;                                // increment the total request by 1
     io_add_type(req_type, currBrokerAmount, produced);      // print it out!
@@ -53,7 +53,7 @@ int remove(string consumer, queue<REQUEST*> *broker) {
     broker -> pop();                                        // remove the request from the queue
     consume_type = consumer.compare("CostAlgoDispatch")     // cost algo is 0, fast algo is 1
         == 0 ? CostAlgoDispatch : FastAlgoDispatch;
-    req_type = request_id ? HumanDriver : RoboDriver;       // human is 0, robot is 1
+    req_type = request_id ? RoboDriver : HumanDriver;       // human is 0, robot is 1
     currBrokerAmount[req_type] -= 1;                        // remove by 1 what is currently on the broker array
 
     if (consume_type == CostAlgoDispatch) {
