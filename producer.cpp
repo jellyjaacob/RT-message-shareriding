@@ -24,7 +24,7 @@ void* producer(void* voidPtr){
 
     int request_id = prodAttr->producer_id++; // set request_id to human/robot + increment to human/robot
     
-    while(true){
+    while(true) {
 
         // sleep depending on the -h and -a flags
         if (prodAttr->hFlag && request_id == HUMAN) {
@@ -33,26 +33,26 @@ void* producer(void* voidPtr){
             usleep(MSPERSEC * prodAttr->aVal);
         }
 
-        // until current is greater than max, produce
-        if(prodAttr->curRequests < prodAttr->maxRequests) {
-
-            if(request_id == HUMAN) // // check for human request, 0 for human and 1 for autonomous
+        if (prodAttr->curRequests >= prodAttr->maxRequests) {
+            sem_post(&prodAttr->unconsumedRequests);        // lock what is on the broker
+            sem_post(&prodAttr->mutex);                     // exit critical region
+            break;
+        } else {                                            // until current is greater than max, produce
+            if(request_id == HUMAN)                         // check for human request, 0 for human and 1 for autonomous
                 sem_wait(&prodAttr->maxHumanRequests);
 
             sem_wait(&prodAttr->maxRiderRequests);          // lock until space is available
             sem_wait(&prodAttr->mutex);                     // enter critical region
 
+            if (prodAttr->curRequests == prodAttr->maxRequests)
+                break;                                      // in the case that an extra requests goes through, we just break
+            
             add(request_id, prodAttr->buffer);              // add the request into buffer
             prodAttr->curRequests++;                        // increment up to max
-
+        
             sem_post(&prodAttr->unconsumedRequests);        // lock what is on the broker
             sem_post(&prodAttr->mutex);                     // exit critical region
         }
-        else{
-            sem_post(&prodAttr->unconsumedRequests);        // lock what is on the broker
-            sem_post(&prodAttr->mutex);                     // exit critical region
-            break;
-        }
-    }
+    } 
     pthread_exit(NULL);
 }

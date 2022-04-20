@@ -52,7 +52,7 @@ int remove(string consumer, queue<REQUEST*> *broker) {
     int request_id = newRequest -> request_id;              // store the request id into an int variable
     broker -> pop();                                        // remove the request from the queue
     consume_type = consumer.compare("CostAlgoDispatch")     // cost algo is 0, fast algo is 1
-        == 0 ? CostAlgoDispatch : FastAlgoDispatch;
+        == 0 ? FastAlgoDispatch : CostAlgoDispatch;
     req_type = request_id ? RoboDriver : HumanDriver;       // human is 0, robot is 1
     currBrokerAmount[req_type] -= 1;                        // remove by 1 what is currently on the broker array
 
