@@ -24,7 +24,7 @@ void* consumer(void* voidPtr) {
     int consumerID = consAttr->consumer_id++;                   // variable to hold consumer ID
     string consumerName = consumerID ? "CostAlgoDispatch" : "FastAlgoDispatch";    //set the type of driver based on the consumer id
 
-    /*
+    /*    
     while(true) {
         if(consAttr->curRequests < consAttr->maxRequests) {
             sem_wait(&consAttr->unconsumedRequests);            // lock what is on the broker
@@ -36,29 +36,7 @@ void* consumer(void* voidPtr) {
 
         }
         else { // when max requests are reached -> final request has been made -> break out of loop
-            sem_post(&consAttr->mutex);
-            //sem_post(&consAttr->finalRequest);
-            break;
-        }
-
-        // sleep depending on the -c and -f flags
-        if(consAttr->cFlag && consumerID == HUMAN) {
-            usleep(MSPERSEC * consAttr->cVal);
-        } else if (consAttr->fFlag && consumerID == AUTONOMOUS){
-            usleep(MSPERSEC * consAttr->fVal);
-        }
-    } */
-
-    while(consAttr->curRequests <= consAttr->maxRequests && consAttr -> buffer -> size() >= 0) {
-        sem_wait(&consAttr->unconsumedRequests);            // lock what is on the broker
-        sem_wait(&consAttr->mutex);                         // enter critical region
-        int cID = remove(consumerName, consAttr -> buffer); // consume the item by taking it off the broker
-        if (cID == HUMAN) { sem_post(&consAttr -> maxHumanRequests); }  // if human request, increment 
-        sem_post(&consAttr->mutex);                         // exit critical region
-        sem_post(&consAttr->maxRiderRequests);              // unlock the space on the broker
-
-        if (consAttr->curRequests == consAttr->maxRequests && consAttr -> buffer -> size() == 0) { // when max requests are reached -> final request has been made -> break out of loop
-            sem_post(&consAttr->mutex);
+            //sem_post(&consAttr->mutex);
             sem_post(&consAttr->finalRequest);
             break;
         }
@@ -69,7 +47,37 @@ void* consumer(void* voidPtr) {
         } else if (consAttr->fFlag && consumerID == AUTONOMOUS){
             usleep(MSPERSEC * consAttr->fVal);
         }
-    }
+    } */
+    
+    while(consAttr->curRequests <= consAttr->maxRequests && consAttr -> buffer -> size() >= 0) {
+        
+        sem_wait(&consAttr->unconsumedRequests);            // lock what is on the broker
+        sem_wait(&consAttr->mutex);                         // enter critical region
+        int cID = remove(consumerName, consAttr -> buffer); // consume the item by taking it off the broker
+        if (cID == HUMAN) { sem_post(&consAttr -> maxHumanRequests); }  // if human request, increment
+        sem_post(&consAttr->mutex);                         // exit critical region
+        sem_post(&consAttr->maxRiderRequests);              // unlock the space on the broker
+
+        
+        // This gives us 151 or 150 requests
+        if (consAttr->curRequests == consAttr->maxRequests && consAttr -> buffer -> size() == 0) { // when max requests are reached -> final request has been made -> break out of loop
+            sem_post(&consAttr->finalRequest);
+            break;
+        } 
+        /*
+        // This always gives us 150 but there is one unconsumed algo dispatcher
+        if(consAttr->curRequests == consAttr->maxRequests){
+            sem_post(&consAttr->finalRequest);
+            //break;
+        } */
+        
+        // sleep depending on the -c and -f flags
+        if(consAttr->cFlag && consumerID == HUMAN) {
+            usleep(MSPERSEC * consAttr->cVal);
+        } else if (consAttr->fFlag && consumerID == AUTONOMOUS){
+            usleep(MSPERSEC * consAttr->fVal);
+        }
+    } 
     //if (consAttr->curRequests >= consAttr->maxRequests && consAttr->buffer->size() == 0)
     //    sem_post(&consAttr->finalRequest);
 
@@ -80,25 +88,5 @@ void* consumer(void* voidPtr) {
         //    sem_post(&consAttr->finalRequest);
     //}
 
-    //if(consumerName.compare("CostAlgoDispatch"))
-        //sem_post(&consAttr->finalCostRequest);
-    //else
-    //    sem_post(&consAttr->finalFastRequest);
-
-    /*
-    while (consAttr->curRequests >= consAttr->maxRequests && consAttr->buffer->size() > 0) {
-        sem_wait(&consAttr->unconsumedRequests);            // lock what is on the broker
-        sem_wait(&consAttr->mutex);                         // enter critical region
-        int cID = remove(consumerName, consAttr -> buffer); // consume the item by taking it off the broker
-        if (cID == HUMAN) { sem_post(&consAttr -> maxHumanRequests); }  // if human request, increment 
-        sem_post(&consAttr->mutex);                         // exit critical region
-        sem_post(&consAttr->maxRiderRequests);              // unlock the space on the broker
-    }   
-    
-    if (consAttr->curRequests >= consAttr->maxRequests && consAttr->buffer->size() == 0)
-        sem_post(&consAttr->finalRequest);
-    */
-
     pthread_exit(NULL); 
-
 }
